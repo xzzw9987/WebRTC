@@ -34,7 +34,7 @@
                 "url": "stun:stunserver.org"
             }]
         };
-        var socket = new WebSocket("ws://localhost:7500"),
+        var socket = new WebSocket("ws://172.21.193.83:7500"),
                 that = this,
                 connections = [],
                 peerConnections = {};
@@ -163,7 +163,11 @@
         that.localStream = null;
     }
 
-    WebRTC.prototype = Object.create(Event.prototype, {constructor: WebRTC});
+    WebRTC.prototype = Object.create(
+            Event.prototype,
+            {
+                constructor: {value: WebRTC}
+            });
 </script>
 <script>
     var rtc = new WebRTC();
