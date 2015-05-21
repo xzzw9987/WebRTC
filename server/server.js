@@ -1,12 +1,3 @@
-/*
- var http = require("http"),
- server = http.createServer(function(req , res){
- res.setHeader("Set-Cookie" , ["name=value"]) ;
- res.setHeader("Access-Control-Allow-Origin" , "*") ;
- res.writeHead(200) ;
- res.end() ;
- }) ;
- server.listen(3000) ;*/
 var server = require("ws").Server,
     wss = new server({port: 7500}),
     socketList = {},

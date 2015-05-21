@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html>
-<head lang="en">
+<head>
     <meta charset="UTF-8">
-    <title></title>
+    <title>WebRTC</title>
 </head>
 <body>
 <video id="myvideo" width="300" height="300"></video>
 <script>
-    //webRTC client
+    /**
+     * WebRTC 客户端实现
+     */
     var Event = function () {
         this.eventList = {};
     }
@@ -27,14 +29,14 @@
             });
         }
     }
-    var WebRTC = function () {
+    var WebRTC = function (websocketServer) {
         Event.call(this);
         var iceServer = {
             "iceServers": [{
                 "url": "stun:stunserver.org"
             }]
         };
-        var socket = new WebSocket("ws://localhost:7500"),
+        var socket = new WebSocket(websocketServer),
                 that = this,
                 connections = [],
                 peerConnections = {};
@@ -170,7 +172,11 @@
             });
 </script>
 <script>
-    var rtc = new WebRTC();
+    /**
+     * WebRTC 应用
+     * @type {WebRTC}
+     */
+    var rtc = new WebRTC("ws://localhost:7500");
     rtc.on("getMyStream", function (stream) {
         document.querySelector("#myvideo").src = URL.createObjectURL(stream);
         document.querySelector("#myvideo").play();
