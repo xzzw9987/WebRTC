@@ -4,7 +4,7 @@
   "description": "",
   "main": "webrtc.html",
   "dependencies": {
-    "ws": "^0.7.2"
+    "ws": "^1.1.1"
   },
   "devDependencies": {},
   "scripts": {
