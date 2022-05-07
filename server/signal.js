@@ -39,7 +39,7 @@ wss.on('connection', function connection(ws) {
                     break
                 default:
                     wss.clients.forEach(client => {
-                        if (client !== ws && ws.type !== client.type && (!data.to || data.to === ws.id) && client.readyState === WebSocket.OPEN) {
+                        if (client !== ws && ws.type !== client.type && (!data.to || data.to === client.id) && client.readyState === WebSocket.OPEN) {
                             delete data.to
                             data.from = ws.id
                             client.send(JSON.stringify(data))
