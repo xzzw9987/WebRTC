@@ -15,6 +15,7 @@ export default class Peer {
     socketPromise = null
     captureStream = null
     peerConnection = null
+    collection = {}
 
     constructor () {
         this.socketPromise = new Promise(resolve => {
@@ -31,8 +32,9 @@ export default class Peer {
 
     async initializeBroadcastClient (recvInfo) {
         try {
+            const peerId = recvInfo.from
             const socket = await this.socketPromise
-            this.peerConnection = new RTCPeerConnection({
+            const peerConnection = new RTCPeerConnection({
                 iceServers: [
                     // {urls: stunServerAddress},
                     {urls: turnServerAddress, username, credential}
@@ -41,41 +43,49 @@ export default class Peer {
             })
 
             for (const track of this.captureStream.getTracks()) {
-                this.peerConnection.addTrack(track)
+                peerConnection.addTrack(track)
             }
 
-            this.peerConnection.addEventListener('negotiationneeded', async () => {
+            peerConnection.addEventListener('negotiationneeded', async () => {
                 console.log('negotiationneeded')
-                const offer = await this.peerConnection.createOffer()
+                const offer = await peerConnection.createOffer()
                 socket.send(
                     JSON.stringify({
                         type: 'offer',
-                        data: offer
+                        data: offer,
+                        to: peerId
                     })
                 )
-                await this.peerConnection.setLocalDescription(offer)
-                console.log('localDescription', this.peerConnection.localDescription.sdp)
+                await peerConnection.setLocalDescription(offer)
+                console.log('localDescription', peerConnection.localDescription.sdp)
             })
 
-            this.peerConnection.addEventListener('icecandidate', async event => {
+            peerConnection.addEventListener('icecandidate', async event => {
                 if (event.candidate) {
                     console.log('icecandidate', event.candidate)
                     socket.send(
                         JSON.stringify({
                             type: 'candidate',
-                            data: event.candidate
+                            data: event.candidate,
+                            to: peerId
                         })
                     )
                 }
             })
+
+            this.collection[peerId] = peerConnection
+
         } catch (err) {
             console.error('Error: ' + err)
         }
     }
 
-    async recvAnswer (d) {
+    recvAnswer (d) {
         console.log('recv answer', d)
-        await this.peerConnection.setRemoteDescription(new RTCSessionDescription(d.data))
+        const peerConnection = this.collection[d.from]
+        if (peerConnection) {
+            return peerConnection.setRemoteDescription(new RTCSessionDescription(d.data))
+        }
     }
 
     async recvOffer (d) {
@@ -94,7 +104,10 @@ export default class Peer {
 
     async addIceCandidate (d) {
         console.log('add ice candidate', d)
-        await this.peerConnection.addIceCandidate(d.data)
+        const peerConnection = this.peerConnection || this.collection[d.from]
+        if (peerConnection) {
+            return peerConnection.addIceCandidate(d.data)
+        }
     }
 
     async receive () {
