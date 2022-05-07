@@ -155,7 +155,7 @@ export default class Peer {
             video: {
                 width: 1920,
                 height: 1080,
-                facingMode: { exact: "environment" }
+                // facingMode: { exact: "environment" }
             }
         })
         const video = document.querySelector('video')
