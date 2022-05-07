@@ -3,7 +3,8 @@
  */
 const stunServerAddress = 'stun:182.61.59.132:3478'
 const turnServerAddress = 'turn:182.61.59.132:3478'
-const wsServerAddress = 'wss://182.61.59.132:8888'
+// const wsServerAddress = 'wss://182.61.59.132:8888'
+const wsServerAddress = 'wss://webrtc-signal-x.herokuapp.com'
 // const stunServerAddress = 'stun:localhost:3478'
 // const turnServerAddress = 'turn:localhost:3478'
 // const wsServerAddress = 'ws://localhost:8888'
