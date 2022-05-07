@@ -154,7 +154,8 @@ export default class Peer {
         const captureStream = await navigator.mediaDevices./*getDisplayMedia*/getUserMedia({
             video: {
                 width: 1920,
-                height: 1080
+                height: 1080,
+                facingMode: { exact: "environment" }
             }
         })
         const video = document.querySelector('video')
