@@ -58,6 +58,7 @@ export default class Peer {
             }
         })
         socket.addEventListener('close', () => {
+            console.log('close')
             this.createWebSocket()
             this.broadcastBindWebSocketEvent()
         })
