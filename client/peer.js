@@ -159,13 +159,14 @@ export default class Peer {
 
         this.peerConnection.addEventListener('track', event => {
             const video = document.createElement('video')
+            video.style.width = '100vw'
+            video.style.height = '100vh'
             if (event.streams.length) {
                 video.srcObject = event.streams[0]
             } else {
                 video.srcObject = new MediaStream([event.track])
             }
             document.body.appendChild(video)
-            // document.body.addEventListener('click', () => video.play())
             video.controls = true
         })
 
