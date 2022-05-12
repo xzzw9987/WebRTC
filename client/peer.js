@@ -34,7 +34,7 @@ export default class Peer {
         })
     }
 
-    broadcastBindWebSocketEvent() {
+    async broadcastBindWebSocketEvent() {
         const socket = await this.socketPromise
         socket.send(JSON.stringify({
             type: 'new-broadcast',
