@@ -18,6 +18,10 @@ export default class Peer {
     collection = {}
 
     constructor () {
+        this.createWebSocket()
+    }
+
+    createWebSocket() {
         this.socketPromise = new Promise(resolve => {
             const ws = new WebSocket(wsServerAddress)
             ws.addEventListener('open', () => {
@@ -27,9 +31,35 @@ export default class Peer {
             ws.addEventListener('message', e => {
                 console.log('recv message', e.data)
             })
-            ws.addEventListener('close', e => {
-                console.log('close', e.reason)
-            })
+        })
+    }
+
+    broadcastBindWebSocketEvent() {
+        const socket = await this.socketPromise
+        socket.send(JSON.stringify({
+            type: 'new-broadcast',
+            id: `broadcast-${Math.floor(10000 * Math.random())}`
+        }))
+        socket.addEventListener('message', e => {
+            try {
+                const data = JSON.parse(e.data)
+                if (data.type === 'new-recv') {
+                    this.initializeBroadcastClient(data)
+                }
+                if (data.type === 'answer') {
+                    this.recvAnswer(data)
+                }
+                if (data.type === 'candidate') {
+                    this.addIceCandidate(data)
+                    // this.peerConnection.addIceCandidate(new RTCIceCandidate(data.data))
+                }
+            } catch (e) {
+                console.log('on message', e)
+            }
+        })
+        socket.addEventListener('close', () => {
+            this.createWebSocket()
+            this.broadcastBindWebSocketEvent()
         })
     }
 
@@ -178,28 +208,6 @@ export default class Peer {
         video.srcObject = captureStream
         video.play()
         this.captureStream = captureStream
-
-        const socket = await this.socketPromise
-        socket.send(JSON.stringify({
-            type: 'new-broadcast',
-            id: `broadcast-${Math.floor(10000 * Math.random())}`
-        }))
-        socket.addEventListener('message', e => {
-            try {
-                const data = JSON.parse(e.data)
-                if (data.type === 'new-recv') {
-                    this.initializeBroadcastClient(data)
-                }
-                if (data.type === 'answer') {
-                    this.recvAnswer(data)
-                }
-                if (data.type === 'candidate') {
-                    this.addIceCandidate(data)
-                    // this.peerConnection.addIceCandidate(new RTCIceCandidate(data.data))
-                }
-            } catch (e) {
-                console.log('on message', e)
-            }
-        })
+        this.broadcastBindWebSocketEvent()
     }
 }
