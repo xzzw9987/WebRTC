@@ -27,6 +27,9 @@ export default class Peer {
             ws.addEventListener('message', e => {
                 console.log('recv message', e.data)
             })
+            ws.addEventListener('close', e => {
+                console.log('close', e.reason)
+            })
         })
     }
 
